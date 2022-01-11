@@ -1,6 +1,7 @@
 use std::ffi::CStr;
 
 #[repr(C)]
+#[derive(Copy, Clone)]
 pub struct TestStruct {
     pub a: i32,
     pub b: u32,
@@ -14,10 +15,18 @@ pub extern "C" fn hello(name: *const libc::c_char) {
 }
 
 #[no_mangle]
-pub extern "C" fn test_pass_struct(s: *mut TestStruct) {
-    unsafe {
-        println!("a = {}; b = {}", (*s).a, (*s).b);
-    }
+pub extern "C" fn test_pass_struct(s: TestStruct) {
+    println!("a = {}; b = {}", s.a, s.b);
+}
+
+#[no_mangle]
+pub extern "C" fn test_handle(s: TestStruct) -> *const TestStruct {
+    &s as *const TestStruct
+}
+
+#[no_mangle]
+pub extern "C" fn struct_from_handle(handle: *const TestStruct) -> TestStruct {
+    unsafe { *handle }
 }
 
 #[no_mangle]
