@@ -25,7 +25,7 @@ pub extern "C" fn test_handle(s: TestStruct) -> *const TestStruct {
 }
 
 #[no_mangle]
-pub extern "C" fn struct_from_handle(handle: *const TestStruct) -> TestStruct {
+pub extern "C" fn get_struct_from_handle(handle: *const TestStruct) -> TestStruct {
     unsafe { *handle }
 }
 

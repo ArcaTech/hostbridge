@@ -22,6 +22,7 @@ func main() {
 	C.hello(C.CString("shared"))
 	C.test_pass_struct(test)
 	handle := C.test_handle(test)
-	test2 := C.struct_from_handle(handle)
+	test2 := C.get_struct_from_handle(handle)
+	println("test2.a = %s", test2.a)
 	C.gomain()
 }
