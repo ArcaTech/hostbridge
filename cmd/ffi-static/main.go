@@ -9,6 +9,8 @@ package main
 */
 import "C"
 
+import "unsafe"
+
 type TestStruct struct {
 	a int32
 	b uint32
@@ -21,6 +23,6 @@ func main() {
 	}
 
 	C.hello(C.CString("static"))
-	C.test_pass_struct(test)
+	C.test_pass_struct((*_Ctype_struct_TestStruct)(unsafe.Pointer(&test)))
 	C.gomain()
 }
