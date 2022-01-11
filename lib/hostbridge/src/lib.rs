@@ -1,5 +1,11 @@
 use std::ffi::CStr;
 
+#[repr(C)]
+pub struct TestStruct {
+    pub a: i32,
+    pub b: u32,
+}
+
 #[no_mangle]
 pub extern "C" fn hello(name: *const libc::c_char) {
     let buf_name = unsafe { CStr::from_ptr(name).to_bytes() };
@@ -8,28 +14,35 @@ pub extern "C" fn hello(name: *const libc::c_char) {
 }
 
 #[no_mangle]
+pub extern "C" fn test_pass_struct(s: *mut TestStruct) {
+    unsafe {
+        println!("a = {}; b = {}", (*s).a, (*s).b);
+    }
+}
+
+#[no_mangle]
 pub extern "C" fn gomain() {
     oldmain().ok();
 }
 
 fn oldmain() -> wry::Result<()> {
-  use wry::{
-      application::{
-          event::{Event, StartCause, WindowEvent},
-          event_loop::{ControlFlow, EventLoop},
-          window::WindowBuilder,
-      },
-      webview::WebViewBuilder,
-  };
+    use wry::{
+        application::{
+            event::{Event, StartCause, WindowEvent},
+            event_loop::{ControlFlow, EventLoop},
+            window::WindowBuilder,
+        },
+        webview::WebViewBuilder,
+    };
 
-  let event_loop = EventLoop::new();
-  let window = WindowBuilder::new()
-      .with_title("Progrium Test")
-      .with_decorations(false)
-      .with_transparent(true)
-      .build(&event_loop)?;
+    let event_loop = EventLoop::new();
+    let window = WindowBuilder::new()
+        .with_title("Progrium Test")
+        .with_decorations(false)
+        .with_transparent(true)
+        .build(&event_loop)?;
 
-  let _webview = WebViewBuilder::new(window)?
+    let _webview = WebViewBuilder::new(window)?
       .with_transparent(true)
       //.with_url("https://progrium.com")?
       .with_url(
@@ -46,16 +59,16 @@ fn oldmain() -> wry::Result<()> {
       )?
       .build()?;
 
-  event_loop.run(move |event, _, control_flow| {
-      *control_flow = ControlFlow::Wait;
+    event_loop.run(move |event, _, control_flow| {
+        *control_flow = ControlFlow::Wait;
 
-      match event {
-          Event::NewEvents(StartCause::Init) => println!("Started"),
-          Event::WindowEvent {
-              event: WindowEvent::CloseRequested,
-              ..
-          } => *control_flow = ControlFlow::Exit,
-          _ => (),
-      }
-  });
+        match event {
+            Event::NewEvents(StartCause::Init) => println!("Started"),
+            Event::WindowEvent {
+                event: WindowEvent::CloseRequested,
+                ..
+            } => *control_flow = ControlFlow::Exit,
+            _ => (),
+        }
+    });
 }

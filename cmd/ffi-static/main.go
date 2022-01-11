@@ -9,7 +9,18 @@ package main
 */
 import "C"
 
+type TestStruct struct {
+	a int32
+	b uint32
+}
+
 func main() {
+	test := TestStruct{
+		a: -3,
+		b: 4,
+	}
+
 	C.hello(C.CString("static"))
+	C.test_pass_struct(test)
 	C.gomain()
 }
