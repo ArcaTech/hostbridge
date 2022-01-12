@@ -16,16 +16,17 @@ type TestStruct struct {
 }
 
 func main() {
-	test := C.struct_TestStruct{
+	C.hello(C.CString("shared"))
+
+	s := C.struct_TestStruct{
 		a: -3,
 		b: 4,
 	}
 
-	C.hello(C.CString("shared"))
-	C.test_pass_struct(test)
-	handle := C.test_handle(test)
-	test2 := C.get_struct_from_handle(handle)
-	fmt.Printf("test2.a = %d\n", test2.a)
-	fmt.Printf("test2.b = %d\n", test2.b)
+	handle := C.get_handle_from_struct(s)
+
+	s2 := C.get_struct_from_handle(handle)
+	fmt.Printf("s2.a = %d; s2.b = %d\n", s2.a, s2.b)
+
 	C.gomain()
 }

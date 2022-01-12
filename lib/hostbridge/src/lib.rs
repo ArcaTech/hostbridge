@@ -22,29 +22,39 @@ pub extern "C" fn hello(name: *const libc::c_char) {
 }
 
 #[no_mangle]
-pub extern "C" fn test_pass_struct(s: TestStruct) {
-    println!("a = {}; b = {}", s.a, s.b);
-}
+pub extern "C" fn get_handle_from_struct(s: TestStruct) -> i32 {
+    println!("get_handle_from_struct: s.a = {}; s.b = {}", s.a, s.b);
 
-#[no_mangle]
-pub extern "C" fn test_handle(s: TestStruct) -> i32 {
     let id = 1;
+    println!("get_handle_from_struct: id = {}", id);
+
     let p = &s as *const TestStruct;
+    println!("get_handle_from_struct: raw pointer = {:p}", p);
+
     let pi = p as usize;
+    println!("get_handle_from_struct: usize pointer = {}", pi);
+
     HANDLE_STORAGE.lock().unwrap().insert(id, pi);
-    println!("test_handle pointer = {}", pi);
+
     id
 }
 
 #[no_mangle]
 pub extern "C" fn get_struct_from_handle(handle: i32) -> TestStruct {
     unsafe {
-        //println!("p = {}", handle);
-        let s = HANDLE_STORAGE.lock().unwrap();
-        let pi = s[&handle] as usize;
+        println!("get_struct_from_handle: handle = {}", handle);
+
+        let storage = HANDLE_STORAGE.lock().unwrap();
+        let pi = storage[&handle] as usize;
+        println!("get_struct_from_handle: usize pointer = {}", pi);
+
         let p = pi as *const TestStruct;
-        println!("get_struct_from_handle pointer = {}", pi);
-        *p
+        println!("get_struct_from_handle: raw pointer = {:p}", p);
+
+        let s: TestStruct = *p;
+        println!("get_struct_from_handle: s.a = {}; s.b = {}", s.a, s.b);
+
+        s
     }
 }
 
