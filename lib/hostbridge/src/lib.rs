@@ -1,4 +1,11 @@
+use lazy_static::lazy_static;
+use std::collections::HashMap;
 use std::ffi::CStr;
+use std::sync::Mutex;
+
+lazy_static! {
+    static ref HANDLE_STORAGE: Mutex<HashMap<i32, usize>> = Mutex::new(HashMap::new());
+}
 
 #[repr(C)]
 #[derive(Copy, Clone)]
@@ -20,13 +27,25 @@ pub extern "C" fn test_pass_struct(s: TestStruct) {
 }
 
 #[no_mangle]
-pub extern "C" fn test_handle(s: TestStruct) -> *const TestStruct {
-    &s as *const TestStruct
+pub extern "C" fn test_handle(s: TestStruct) -> i32 {
+    let id = 1;
+    let p = &s as *const TestStruct;
+    let pi = p as usize;
+    HANDLE_STORAGE.lock().unwrap().insert(id, pi);
+    println!("test_handle pointer = {}", pi);
+    id
 }
 
 #[no_mangle]
-pub extern "C" fn get_struct_from_handle(handle: *const TestStruct) -> TestStruct {
-    unsafe { *handle }
+pub extern "C" fn get_struct_from_handle(handle: i32) -> TestStruct {
+    unsafe {
+        //println!("p = {}", handle);
+        let s = HANDLE_STORAGE.lock().unwrap();
+        let pi = s[&handle] as usize;
+        let p = pi as *const TestStruct;
+        println!("get_struct_from_handle pointer = {}", pi);
+        *p
+    }
 }
 
 #[no_mangle]

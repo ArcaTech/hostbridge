@@ -8,6 +8,8 @@ package main
 */
 import "C"
 
+import "fmt"
+
 type TestStruct struct {
 	a int32
 	b uint32
@@ -23,6 +25,7 @@ func main() {
 	C.test_pass_struct(test)
 	handle := C.test_handle(test)
 	test2 := C.get_struct_from_handle(handle)
-	println("test2.a = %s", test2.a)
+	fmt.Printf("test2.a = %d\n", test2.a)
+	fmt.Printf("test2.b = %d\n", test2.b)
 	C.gomain()
 }

@@ -7,5 +7,6 @@ edition = "2021"
 crate-type = ["cdylib", "staticlib"]
 
 [dependencies]
+lazy_static = "1"
 libc = "0.2.2"
 wry = "0.12"
