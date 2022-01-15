@@ -8,15 +8,27 @@ package main
 */
 import "C"
 
-import "fmt"
+import (
+	"fmt"
+	"runtime"
+)
 
 type TestStruct struct {
 	a int32
 	b uint32
 }
 
+func RunCMain(done chan bool) {
+	runtime.LockOSThread()
+	C.gomain()
+	done <- true
+}
+
 func main() {
+	done := make(chan bool)
+
 	C.hello(C.CString("shared"))
+	go RunCMain(done)
 
 	s := C.struct_TestStruct{
 		a: -3,
@@ -28,5 +40,5 @@ func main() {
 	s2 := C.get_struct_from_handle(handle)
 	fmt.Printf("s2.a = %d; s2.b = %d\n", s2.a, s2.b)
 
-	C.gomain()
+	<-done
 }
