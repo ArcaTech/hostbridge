@@ -4,7 +4,8 @@ use std::ffi::CStr;
 use std::sync::Mutex;
 
 lazy_static! {
-    static ref HANDLE_STORAGE: Mutex<HashMap<i32, TestStruct>> = Mutex::new(HashMap::new());
+    static ref HANDLE_STORAGE: Mutex<HashMap<i32, &'static TestStruct>> =
+        Mutex::new(HashMap::new());
 }
 
 #[repr(C)]
@@ -28,13 +29,10 @@ pub extern "C" fn get_handle_from_struct(s: TestStruct) -> i32 {
     let id = 1;
     println!("get_handle_from_struct: id = {}", id);
 
-    // let p = &s as *const TestStruct;
-    // println!("get_handle_from_struct: raw pointer = {:p}", p);
+    let static_s: &'static mut TestStruct = Box::leak(Box::new(s));
+    println!("get_handle_from_struct: raw pointer = {:p}", static_s);
 
-    // let pi = p as usize;
-    // println!("get_handle_from_struct: usize pointer = {}", pi);
-
-    HANDLE_STORAGE.lock().unwrap().insert(id, s);
+    HANDLE_STORAGE.lock().unwrap().insert(id, static_s);
 
     id
 }
@@ -44,13 +42,11 @@ pub extern "C" fn get_struct_from_handle(handle: i32) -> TestStruct {
     println!("get_struct_from_handle: handle = {}", handle);
 
     let storage = HANDLE_STORAGE.lock().unwrap();
-    let s = storage[&handle];
-    // //println!("get_struct_from_handle: usize pointer = {}", pi);
 
-    // let p = pi as *const TestStruct;
-    // //println!("get_struct_from_handle: raw pointer = {:p}", p);
+    let static_s = storage[&handle];
+    println!("get_struct_from_handle: raw pointer = {:p}", static_s);
 
-    // let s: TestStruct = *p;
+    let s: TestStruct = *static_s;
     println!("get_struct_from_handle: s.a = {}; s.b = {}", s.a, s.b);
 
     s
