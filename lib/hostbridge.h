@@ -1,10 +1,9 @@
-struct TestStruct {
-	int a;
-	unsigned int b;
-};
+typedef void (*rust_callback)(int32_t);
+void register_callback(rust_callback);
 
-void init_stuff();
-void hello(char *name);
-void *get_handle_from_struct(struct TestStruct s);
-struct TestStruct get_struct_from_handle(void *handle);
-void gomain();
+static inline void RegisterCallback(rust_callback callback) {
+	printf("C: RegisterCallback\n");
+	register_callback(callback);
+}
+
+void start_loop();

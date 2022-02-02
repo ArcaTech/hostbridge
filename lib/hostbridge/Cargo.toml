@@ -9,4 +9,5 @@ crate-type = ["cdylib", "staticlib"]
 [dependencies]
 lazy_static = "1"
 libc = "0.2.2"
+log = "0.4"
 wry = "0.12"

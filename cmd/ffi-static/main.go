@@ -5,29 +5,28 @@ package main
 
 /*
 #cgo LDFLAGS: ./lib/libhostbridge.a -ldl -framework Carbon -framework Cocoa -framework CoreFoundation -framework CoreVideo -framework IOKit -framework WebKit
+#include <stdio.h>
 #include "../../lib/hostbridge.h"
 */
 import "C"
 
-import "fmt"
+import (
+	"fmt"
+	"unsafe"
+)
 
-type TestStruct struct {
-	a int32
-	b uint32
+func on_event(a int32) {
+	fmt.Println("Go: event: ", a)
+}
+
+var OnEventFunc = on_event
+
+func register_callback() {
+	fmt.Println("Go: register_callback")
+	C.RegisterCallback((*[0]byte)(unsafe.Pointer(&OnEventFunc)))
 }
 
 func main() {
-	C.hello(C.CString("shared"))
-
-	s := C.struct_TestStruct{
-		a: -3,
-		b: 4,
-	}
-
-	handle := C.get_handle_from_struct(s)
-
-	s2 := C.get_struct_from_handle(handle)
-	fmt.Printf("s2.a = %d; s2.b = %d\n", s2.a, s2.b)
-
-	C.gomain()
+	register_callback()
+	C.start_loop()
 }
